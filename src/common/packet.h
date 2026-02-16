@@ -18,93 +18,10 @@ namespace common
 			Serializable() = default;
 			virtual ~Serializable() = default;
 
-			virtual void Write(Out& out) const = 0;
-			virtual void Read([[maybe_unused]] In* in) {} // To allow using Read in constructor
+			virtual void Write(Out & out) const = 0;
+			virtual void Read([[maybe_unused]] In * in) {} // To allow using Read in constructor
 
 			virtual Size GetPacketSize() const = 0;
-		};
-
-		class SerializableString final : public Serializable, public string
-		{
-		public:
-			using Size = enet_uint16;
-			static string kDummy;
-
-			SerializableString()
-				: _data(nullptr), _sz(0), _ref(static_cast<string&>(*this))
-			{}
-
-			~SerializableString() override;
-
-			SerializableString(Size sz)
-				: _data(nullptr), _sz(sz), _ref(static_cast<string&>(*this))
-			{
-				
-			}
-
-			// String with any length
-			explicit SerializableString(string& str)
-				: _data(nullptr), _sz(0), _ref(str)
-			{
-
-			}
-
-			// String with fixed length
-			explicit SerializableString(string& str, Size sz)
-				: _data(nullptr), _sz(sz), _ref(str)
-			{
-				if (_sz == 0)
-				{
-					throw std::exception("Trying to construct a fixed SerializableString with 0 length");
-				}
-			}
-			
-			// char* with any length
-			explicit SerializableString(const char* data)
-				: _data(data), _sz(0), _ref(kDummy)
-			{
-
-			}
-
-			// char* with fixed length
-			explicit SerializableString(const char* data, Size sz)
-				: _data(data), _sz(sz), _ref(kDummy)
-			{
-				if (_sz == 0)
-				{
-					throw std::exception("Trying to construct a fixed char* SerializableString with 0 length");
-				}
-			}
-
-			void Write(Out & out) const override;
-
-			void Read(In * in) override;
-
-			packet::Size GetPacketSize() const override;
-
-			auto IsString() const
-			{
-				return !_data && _sz == 0;
-			}
-
-			auto IsFixedString() const
-			{
-				return !_data && _sz != 0;
-			}
-
-			auto IsChar() const
-			{
-				return _data && _sz == 0;
-			}
-
-			auto IsFixedChar() const
-			{
-				return _data && _sz != 0;
-			}
-
-			const char* _data;
-			Size _sz;
-			string& _ref = kDummy;
 		};
 
 #define SERIALIZE_IMPL(params)					\
@@ -133,7 +50,9 @@ namespace common
 			Base(ENetPacket* packet, const Size sz);
 
 			template<typename T = typename enable_if_t<!is_pointer_v<T>>>
-			auto GetPointer() const { return reinterpret_cast<T*>(_ptr); }
+			auto GetPointer() const { 
+				return reinterpret_cast<T*>(_ptr); 
+			}
 
 			class Sizer
 			{
@@ -154,6 +73,19 @@ namespace common
 					{
 						return val.GetPacketSize();
 					}
+					else if constexpr (is_string<T>)
+					{
+						return sizeof(Size) + val.size();
+					}
+					/*else if constexpr (is_same_cr<T, char*>)
+					{
+						// #todo #net check if has to add +1 for null termination or something
+						sz += sizeof(Size) + strlen(_data);
+					} 
+					else if constexpr(is_same_cr<T, EChar>)
+					{
+						sz += strlen(_data);
+					}*/
 					else
 					{
 						return sizeof(val);
@@ -201,6 +133,20 @@ namespace common
 
 			void Send(ENetPeer* peer, const enet_uint8 channel = 0) const;
 
+			template<typename T, typename = std::enable_if<std::is_pointer_v<T>>>
+			void WriteFixed(T * src, unsigned long len) {
+				memcpy(GetPointer<void>(), src, len);
+				Move(len);
+			}
+
+			void WriteFixed(std::string src, unsigned long len)
+			{
+				if(src.size() < len)
+					src.resize(len);
+
+				WriteFixed((const char*)src.c_str(), len);
+			}
+
 			template<typename T, typename ... Args>
 			void Write(const T & t, const Args & ...args)
 			{
@@ -232,6 +178,19 @@ namespace common
 				{
 					v.Write(*this);
 				}
+				else if constexpr (is_same_v<T, string>)
+				{
+					auto sz = (Size)v.size();
+					_Write(sz);
+
+					if (HasOverflowed(sz))
+					{
+						return;
+					}
+
+					std::copy(&v[0], &v[0] + sz, GetPointer<char>());
+					Move(sz);
+				}
 				else
 				{
 					const auto sz = Sizer::Get(v);
@@ -253,6 +212,19 @@ namespace common
 
 			bool HasOverflowed(const Size sz) override;
 			void Move(const Size sz) override;
+
+			void ReadFixed(char * dest, unsigned long len) 
+			{
+				memcpy(dest, GetPointer<void>(), len);
+				Move(len);
+			}
+
+			[[nodiscard]] std::string ReadFixed(unsigned long len)
+			{
+				std::string str(len, '\0');
+				ReadFixed(str.data(), len);
+				return str;
+			}
 
 			template<typename T, typename ... Args>
 			void Read(T & t, Args & ...args)
@@ -289,11 +261,18 @@ namespace common
 			template<typename T, typename = enable_if_t<!is_pointer_v<T>>>
 			void _Read(T & v)
 			{
-				static_assert(!is_same_v<string, T> && !is_same_v<char*, T>, "Use NetString or packet::SerializableString");
-
 				if constexpr (is_base_of_v<Serializable, T>)
 				{
 					v.Read(this);
+				}
+				else if constexpr(is_string<T>)
+				{
+					Size sz;
+					_Read(sz);
+
+					v.resize(sz);
+					std::copy(GetPointer<char>(), GetPointer<char>() + sz, &v[0]);
+					Move(sz);
 				}
 				else
 				{
@@ -303,14 +282,6 @@ namespace common
 
 					v = *GetPointer<T>();
 					Move(sz);
-
-#ifdef DEBUG_PACKET
-					// #todo std
-					if constexpr (is_same_v<NetOp, T>)
-					{
-						Print("Reading NetOp{}", Format(v));
-					}
-#endif
 				}
 			}
 		};
@@ -319,5 +290,5 @@ namespace common
 	using InPkt = packet::In;
 	using OutPkt = packet::Out;
 	using OutPktRef = packet::OutPacketPtr&;
-	using NetString = packet::SerializableString;
+	using ESizer = packet::Base::Sizer;
 }

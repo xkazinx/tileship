@@ -2,6 +2,8 @@
 
 namespace common
 {
+	unique_ptr<Random> g_rnd = make_unique<Random>();
+
 namespace tile
 {
 #ifdef CLIENT

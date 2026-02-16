@@ -4,7 +4,7 @@ enum class LogType
 {
 	Debug,
 	Error,
-	Info,
+	Out,
 };
 
 inline thread_local string kDummy;
@@ -41,20 +41,23 @@ namespace Log
 	using Type = LogType;	
 
 	template <typename ... Args>
-	void Debug(Args && ... args) 
+	void Debug(std::format_string<Args ...> fmt, Args && ... args) 
 	{
-		ConsoleOut<Type::Debug>(format(forward<Args>(args)...).c_str());
+		auto str = std::vformat(fmt.get(), std::make_format_args(args ...));
+		ConsoleOut<Type::Debug>(str.c_str());
 	}
 
 	template <typename ... Args>
-	void Error(Args && ... args)
+	void Error(std::format_string<Args ...> fmt, Args && ... args)
 	{
-		ConsoleOut<Type::Error>(format(forward<Args>(args)...).c_str());
+		auto str = std::vformat(fmt.get(), std::make_format_args(args ...));
+		ConsoleOut<Type::Error>(str.c_str());
 	}
 }
 
 template <typename ... Args>
-void Print(Args && ... args)
+void Print(std::format_string<Args ...> fmt, Args && ... args)
 {
-	ConsoleOut<LogType::Info>(format(forward<Args>(args)...).c_str());
+	auto str = std::vformat(fmt.get(), std::make_format_args(args ...));
+	ConsoleOut<LogType::Out>(str.c_str());
 }

@@ -19,7 +19,7 @@ public:
 	}
 
 	packet::Size GetPacketSize() const override {
-		return _user.GetPacketSize() + _pass.GetPacketSize();
+		return ESizer::Get(_user, _pass);
 	}
 
 	// #todo #auth
@@ -27,6 +27,6 @@ public:
 		return true;
 	}
 	
-	NetString _user, _pass;
+	string _user, _pass;
 };
 }

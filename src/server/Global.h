@@ -3,6 +3,7 @@
 class App;
 class PlayerMgr;
 class Player;
+class Random;
 
 namespace Global
 {

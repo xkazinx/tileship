@@ -62,6 +62,7 @@ void Socket::Tick() const
 			if (ev.peer->data)
 			{
 				Print("Client {} disconnected", Format(ev.peer));
+				delete ev.peer->data; // #todo?
 				ev.peer->data = nullptr;
 			}
 			_on_disconnect(ev);

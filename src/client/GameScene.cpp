@@ -2,6 +2,8 @@
 #include "GameScene.h"
 #include "Map.h"
 #include "Tile.h"
+#include "App.h"
+#include "Player.h"
 
 GameScene::GameScene()
 {
@@ -25,7 +27,7 @@ GameScene::GameScene()
 
 GameScene::~GameScene()
 {
-
+	g_player = nullptr;
 }
 
 void GameScene::Tick()

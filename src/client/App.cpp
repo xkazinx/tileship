@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "App.h"
-#include "SceneMgr.h"
+#include "Scenes.h"
+#include "Player.h"
+#include "GameScene.h"
 
 App::App()
 	: Broadcaster<Op>(NetOp::Main)
@@ -163,10 +165,24 @@ void App::OnPacket([[maybe_unused]] ENetEvent& ev)
 
 void App::NetOp_Login()
 {
-	
+	auto result = GetPacket()->ReadAs<bool>();
+
+	Log::Debug("Login result: {}", result);
+
+	if(!result)
+		return;
+
+	string name;
+	GetPacket()->Read(name);
+
+	g_scene->Set(SceneID::Game);	
+
+	{
+		g_scene->Get<GameScene>()->_player = make_unique<Player>(name);
+		g_player = g_scene->Get<GameScene>()->_player.get();
+	}
 }
 
 void App::NetOp_CreateAccount()
 {
-	
 }

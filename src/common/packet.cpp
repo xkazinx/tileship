@@ -3,8 +3,6 @@
 
 namespace common::packet
 {
-	string SerializableString::kDummy;
-
 	Base::Base(ENetPacket* packet, const Size sz)
 		: _ptr((char*)packet->data), _size(sz),
 		_enet_packet(packet), _overflow(false)
@@ -82,102 +80,4 @@ namespace common::packet
 	{
 		_Move(sz, false);
 	}
-
-	void SerializableString::Write(Out & out) const
-	{
-		Size sz = 1;
-		if (IsString() || IsChar())
-		{
-			sz += static_cast<Size>(IsString() ? _ref.size() : strlen(_data));
-			out.Write(sz);
-		}
-		else //if (IsFixedString() || IsFixedChar())
-		{
-			if (IsFixedString())
-			{
-				sz += (Size)strlen(_ref.c_str());
-			}
-			else //if (IsFixedChar())
-			{
-				sz += (Size)strlen(_data);
-			}
-		}
-		
-		if (out.HasOverflowed(sz))
-			return;
-
-		copy_n(IsString() || IsFixedString() ? _ref.c_str() : string(_data).c_str(), 
-			sz, out.GetPointer<char>());
-
-		// #todo #packet not optimum
-		//memcpy(out.GetPointer<char>(), 
-			//IsString() || IsFixedString() ? _ref.c_str() : string(_data).c_str(), sz);
-		
-		//std::copy_n(IsString() || IsFixedString() ? _ref.data() : (char*)_data,
-			//sz, out.GetPointer<char>());
-
-		out.Move(IsFixedChar() || IsFixedString() ? _sz + 1 : sz);
-	}
-
-	void SerializableString::Read(In* in)
-	{
-		Size sz;
-		if (IsString() || IsChar())
-		{
-			in->Read(sz);
-		}
-		else //if (IsFixedString() || IsFixedChar())
-		{
-			sz = _sz + 1;
-		}
-
-		if (in->HasOverflowed(sz))
-			return;
-
-		if (IsString() || IsFixedString())
-		{
-			if (_ref.capacity() < sz)
-			{
-				_ref.reserve(sz);
-			}
-			
-			_ref.clear();
-
-			// #netstring #packet #todo If you send "hola\0chau" you only receive "hola" when reading with string,
-			// could add an argument to determine behavior
-			_ref.assign(in->GetPointer<char>(), strlen(in->GetPointer<char>()));
-		}
-		else
-		{
-			copy_n(in->GetPointer<char>(), sz, (char*)_data);
-			//memcpy((char*)_data, in->GetPointer<char>(), sz);
-		}
-
-		in->Move(sz);
-	}
-
-	packet::Size SerializableString::GetPacketSize() const
-	{
-		packet::Size sz = 1;
-		if (IsFixedString() || IsFixedChar())
-		{
-			sz += _sz;
-		}
-		else if (IsString())
-		{
-			sz += sizeof(Size) + _ref.size();
-		}
-		else if (IsChar())
-		{
-			// #net check if has to add +1 for null termination or something
-			sz += sizeof(Size) + strlen(_data);
-		}
-
-#ifdef DEBUG_PACKET
-		Log::Debug("SerializableString::GetPacketSize(): {}", sz);
-		return sz;
-#endif
-	}
-
-	SerializableString::~SerializableString() = default;
 }

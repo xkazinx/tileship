@@ -25,6 +25,15 @@
     <Filter Include="scene\login">
       <UniqueIdentifier>{2065043a-04f5-492b-8c30-e7844f924648}</UniqueIdentifier>
     </Filter>
+    <Filter Include="scene\game">
+      <UniqueIdentifier>{5af8bffd-2217-4106-bf47-86962e6bb246}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\game\unit">
+      <UniqueIdentifier>{9c10cabd-c8d4-410b-a1c2-091c9395b886}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene\game\map">
+      <UniqueIdentifier>{94368e4b-abad-4387-8137-7a6556d9390a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -42,7 +51,7 @@
     <ClInclude Include="Scene.h">
       <Filter>scene</Filter>
     </ClInclude>
-    <ClInclude Include="SceneMgr.h">
+    <ClInclude Include="Scenes.h">
       <Filter>scene</Filter>
     </ClInclude>
     <ClInclude Include="imgui\imconfig.h">
@@ -72,20 +81,29 @@
     <ClInclude Include="imgui\imgui-SFML_export.h">
       <Filter>scene\ui\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="GameScene.h">
-      <Filter>scene\lobby</Filter>
-    </ClInclude>
-    <ClInclude Include="Map.h">
-      <Filter>scene\lobby</Filter>
-    </ClInclude>
-    <ClInclude Include="Tile.h">
-      <Filter>scene\lobby</Filter>
-    </ClInclude>
     <ClInclude Include="LobbyScene.h">
       <Filter>scene\lobby</Filter>
     </ClInclude>
     <ClInclude Include="LoginScene.h">
       <Filter>scene\login</Filter>
+    </ClInclude>
+    <ClInclude Include="GameScene.h">
+      <Filter>scene\game</Filter>
+    </ClInclude>
+    <ClInclude Include="Units.h">
+      <Filter>scene\game\unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Unit.h">
+      <Filter>scene\game\unit</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>scene\game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>scene\game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>scene\game\unit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -104,7 +122,7 @@
     <ClCompile Include="Scene.cpp">
       <Filter>scene</Filter>
     </ClCompile>
-    <ClCompile Include="SceneMgr.cpp">
+    <ClCompile Include="Scenes.cpp">
       <Filter>scene</Filter>
     </ClCompile>
     <ClCompile Include="..\common\socket.cpp">
@@ -131,15 +149,6 @@
     <ClCompile Include="imgui\imgui-SFML.cpp">
       <Filter>scene\ui\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
-      <Filter>scene\lobby</Filter>
-    </ClCompile>
-    <ClCompile Include="Map.cpp">
-      <Filter>scene\lobby</Filter>
-    </ClCompile>
-    <ClCompile Include="Tile.cpp">
-      <Filter>scene\lobby</Filter>
-    </ClCompile>
     <ClCompile Include="LobbyScene.cpp">
       <Filter>scene\lobby</Filter>
     </ClCompile>
@@ -157,6 +166,24 @@
     </ClCompile>
     <ClCompile Include="..\common\auth.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="GameScene.cpp">
+      <Filter>scene\game</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit.cpp">
+      <Filter>scene\game\unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Units.cpp">
+      <Filter>scene\game\unit</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>scene\game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>scene\game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>scene\game\unit</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

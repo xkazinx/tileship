@@ -2,6 +2,7 @@
 #include "Global.h"
 #include "PlayerMgr.h"
 #include "Player.h"
+#include <random.h>
 
 namespace Global
 {

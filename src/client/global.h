@@ -1,8 +1,10 @@
 #pragma once
 
 class App;
-class SceneMgr;
+class Scenes;
 class Map;
+class Player;
+class Units;
 
 #define DEBUG_MODE
 
@@ -12,8 +14,10 @@ namespace Global
 
 	extern App* g_app;
 	extern unique_ptr<Random> g_rand;
-	extern unique_ptr<SceneMgr> g_scene;
+	extern unique_ptr<Scenes> g_scene;
 	extern unique_ptr<Socket> g_sock;
+	extern Player * g_player;
+	extern unique_ptr<Units> g_units;
 	extern Map* g_map;
 
 	extern void Initialize();

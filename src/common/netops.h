@@ -6,6 +6,7 @@ namespace common
 	enum class NetOp : u8
 	{
 		Main,
+		Player,
 		Disconnect,
 	};
 
@@ -13,5 +14,10 @@ namespace common
 	{
 		Login,
 		CreateAccount,
+	};
+
+	enum class PlayerOp : u8
+	{
+		Max,
 	};
 }

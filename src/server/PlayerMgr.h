@@ -10,5 +10,7 @@ public:
 
 	PlayerMgr();
 	~PlayerMgr();
+
+	[[nodiscard]] Player * OnAuth(ENetPeer * peer);
 };
 

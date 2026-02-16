@@ -3,6 +3,7 @@
 
 class Map;
 class Tile;
+class Player;
 
 class GameScene : public Scene
 {
@@ -17,4 +18,5 @@ public:
 	void HandleEvents(const sf::Event& ev) override;
 	
 	unique_ptr<Map> _map;
+	unique_ptr<Player> _player;
 };

@@ -71,6 +71,21 @@ using std::underlying_type_t;
 using std::is_base_of_v;
 using std::is_pointer_v;
 
+template <typename T, typename... Ts>
+concept is_any = std::disjunction_v<std::is_same<T, Ts>...>;
+
+/*
+template <class T>
+struct is_string : std::bool_constant<
+	is_same_v<string, T> ||
+	is_same_v<const string, T> ||
+	is_same_v<string&, T> ||
+	is_same_v<const string&, T>>{};
+	*/
+
+template <typename T>
+concept is_string = is_any<T, string, const string, string&, const string &>;
+
 #include <magic_enum.h>
 using namespace magic_enum;
 
@@ -83,10 +98,11 @@ using namespace magic_enum;
 #include <packet.h>
 #include <socket.h>
 #include <broadcaster.h>
-#include <auth.h>
 
 namespace common
 {
+	extern unique_ptr<Random> g_rnd;
+
 constexpr u16 kPort = 321;
 constexpr const char * kHost = "localhost";
 
@@ -95,6 +111,16 @@ constexpr underlying_type_t<T> to_underlying(T value) noexcept
 {
 	return underlying_type_t<T>(value);
 }
+
+template<class T>
+class Point
+{
+public:
+	T x, y;
+};
+
+using RPt = Point<i16>;
+using MPt = Point<float>;
 
 namespace tile
 {
@@ -169,10 +195,10 @@ inline string Format(T v, FormatType type = FormatType::None)
 		return format("({}:{}:PlayerIdx({}))", Socket::FetchIP(v), v->address.port, 
 			v->data ? *reinterpret_cast<PlayerIdx*>(v->data) : player::kNullIdx);
 	}
-	else if constexpr (is_same_v<Auth, T>)
+	/*else if constexpr (is_same_v<NetString, T>)
 	{
-		return format("({}:{})", v._user.c_str(), v._pass.c_str());
-	}
+		return format("({}:{})", v.IsChar() ? v._data : v._str);
+	}*/
 	else
 	{
 		return to_string(v);
