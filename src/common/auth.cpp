@@ -3,9 +3,7 @@
 
 namespace common
 {
-Auth::Auth() :
-	_user(player::kNameSize),
-	_pass(player::kPasswordSize)
+Auth::Auth()
 {
 
 }

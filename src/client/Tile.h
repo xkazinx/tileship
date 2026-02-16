@@ -1,11 +1,14 @@
 #pragma once
 
+class Unit;
+
 class Tile final
 {
 	using Type = tile::Type;
 
 public:
 	Tile(Type type, const sf::Vector2i& pos);
+
 	~Tile();
 
 	Type _type;
@@ -15,4 +18,6 @@ public:
 	sf::Vector2i _pos;
 	sf::VertexBuffer _vertex_buffer;
 	sf::VertexArray _vertex_array;
+
+	Unit * _unit;
 };

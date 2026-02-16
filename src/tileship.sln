@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31424.327
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35222.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "client", "client\client.vcxproj", "{EC94C57D-76DD-43AF-B774-4163CC02B7B9}"
 EndProject
@@ -9,13 +9,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "server", "server\server.vcx
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "common", "common", "{8C0947C4-1BA3-49D3-BF16-EBBAD65BFD66}"
 	ProjectSection(SolutionItems) = preProject
-		common\auth.cpp = common\auth.cpp
-		common\auth.h = common\auth.h
 		common\broadcaster.h = common\broadcaster.h
 		common\common.cpp = common\common.cpp
 		common\common.h = common\common.h
 		common\magic_enum.h = common\magic_enum.h
 		common\netops.h = common\netops.h
+		common\notes.txt = common\notes.txt
 		common\packet.cpp = common\packet.cpp
 		common\packet.h = common\packet.h
 		common\random.cpp = common\random.cpp

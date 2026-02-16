@@ -37,6 +37,14 @@ namespace common::broadcaster
 			return OutPkt::CreateDynamic(_net_op, op, std::forward<Args>(args)...);
 		}
 
+		template<typename ... Args>
+		packet::OutPacketPtr DynamicPacket(u32 sz, Op op, Args && ... args) const
+		{
+			auto pkt = make_unique<OutPkt>(sizeof(_net_op) + sizeof(Op) + sz);
+			pkt->Write(_net_op, op, std::forward<Args>(args)...);
+			return pkt;
+		}
+
 	protected:
 		Op _op;
 		NetOp _net_op;

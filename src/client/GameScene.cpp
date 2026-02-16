@@ -2,10 +2,13 @@
 #include "GameScene.h"
 #include "Map.h"
 #include "Tile.h"
+#include "App.h"
+#include "Player.h"
 
 GameScene::GameScene()
 {
-	{
+	_g = this;
+	/*{
 		//const string data = "10";
 		const string data = "3012012012";
 		vector<unique_ptr<Tile>> tiles;
@@ -19,18 +22,20 @@ GameScene::GameScene()
 		}
 
 		_map = make_unique<Map>(tiles, size);
-	}
+	}*/
+
+	_map = make_unique<Map>();
 }
 
 
 GameScene::~GameScene()
 {
-
+	_p = nullptr;
 }
 
 void GameScene::Tick()
 {
-
+	_map->UpdateCamera(true);
 }
 
 void GameScene::Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const

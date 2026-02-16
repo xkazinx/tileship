@@ -3,6 +3,8 @@
 class App;
 class PlayerMgr;
 class Player;
+class Random;
+class GameMgr;
 
 namespace Global
 {
@@ -11,6 +13,7 @@ namespace Global
 	extern App* g_app;
 	extern unique_ptr<Socket> g_sock;
 	extern unique_ptr<PlayerMgr> g_player_mgr;
+	extern unique_ptr<GameMgr> g_games;
 
 	extern void Initialize();
 	extern void Deinitialize();

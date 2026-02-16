@@ -5,12 +5,8 @@
 LoginScene::LoginScene() : 
 	_circle(50.f, 50)
 {
-	_circle.setFillColor(sf::Color::Red);
-
-	_auth._user.resize(player::kNameSize);
-	_auth._pass.resize(player::kPasswordSize);
+	_name.resize(player::kNameSize);
 }
-
 
 LoginScene::~LoginScene()
 {
@@ -23,31 +19,26 @@ void LoginScene::Tick()
 
 void LoginScene::ProcessUI() const
 {
-	ImGui::Begin("Hello, world!");
-	ImGui::InputText("Username", (char*)_auth._user.data(), player::kNameSize + 1);
-	ImGui::InputText("Password", (char*)_auth._pass.data(), player::kPasswordSize + 1, ImGuiInputTextFlags_Password);
+	ImGui::SetNextWindowSize({ 250, 150 });
+	ImGui::Begin("Authentication");
+	ImGui::InputText("Username", (char*)_name.data(), _name.size());
 
 	if (ImGui::Button("Login"))
 	{
-		Log::Debug("Sent Login Auth{}", Format(_auth));
-		g_app->Send(MainOp::Login, _auth);
-
-		// #test sending and reading with size 32 but written < 32 with char and string
-		// #test sending and reading with size 32 and written 32 with char and string
+		if(g_sock)
+		{
+			auto pkt = g_app->DynamicPacket(player::kNameSize + 1, MainOp::Login);
+			pkt->WriteFixed(_name, player::kNameSize);
+			Send(pkt);
+		}
 	}
 	
-	if (ImGui::Button("Create Account"))
-	{
-		Log::Debug("Sent Create Account Auth{}", Format(_auth));
-		g_app->Send(MainOp::CreateAccount, _auth);
-	}
-
 	ImGui::End();
 }
 
 void LoginScene::Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const
 {
-	tgt.draw(_circle, states);
+
 }
 
 void LoginScene::HandleEvents([[maybe_unused]] const sf::Event& ev)

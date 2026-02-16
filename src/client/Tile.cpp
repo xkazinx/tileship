@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Tile.h"
 #include "Map.h"
+#include "Unit.h"
 
 Tile::Tile(Type type, const sf::Vector2i& pos)
 	: _type(type), _pos(pos)

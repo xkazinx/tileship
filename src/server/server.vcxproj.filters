@@ -22,6 +22,9 @@
     <Filter Include="player">
       <UniqueIdentifier>{bf6c2dff-36a9-4ff9-81fb-6da576dc39e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="game\map">
+      <UniqueIdentifier>{6dc823e6-0229-4ddb-886b-31b1b57d4df2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App.h">
@@ -47,6 +50,21 @@
     </ClInclude>
     <ClInclude Include="Sql.h">
       <Filter>app</Filter>
+    </ClInclude>
+    <ClInclude Include="GameMgr.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="Game.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="Unit.h">
+      <Filter>player</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>game\map</Filter>
+    </ClInclude>
+    <ClInclude Include="Tile.h">
+      <Filter>game\map</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -88,6 +106,21 @@
     </ClCompile>
     <ClCompile Include="..\common\auth.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="GameMgr.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="Unit.cpp">
+      <Filter>player</Filter>
+    </ClCompile>
+    <ClCompile Include="Map.cpp">
+      <Filter>game\map</Filter>
+    </ClCompile>
+    <ClCompile Include="Tile.cpp">
+      <Filter>game\map</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

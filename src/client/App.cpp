@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "App.h"
-#include "SceneMgr.h"
+#include "Scenes.h"
+#include "Player.h"
+#include "GameScene.h"
+#include "Map.h"
 
 App::App()
 	: Broadcaster<Op>(NetOp::Main)
@@ -53,7 +56,7 @@ void App::InitializeWindow()
 		settings.minorVersion = 2;
 	}
 
-	_window.create(VideoMode(g_res_x, g_res_y), kAppName, sf::Style::Default, settings);
+	_window.create(VideoMode(g_res.x, g_res.y), kAppName, sf::Style::Default, settings);
 
 	// https://www.sfml-dev.org/tutorials/2.5/window-opengl.php
 	_window.setActive(true);
@@ -154,7 +157,9 @@ void App::OnPacket([[maybe_unused]] ENetEvent& ev)
 	switch (const auto op = in.ReadAs<NetOp>();
 		op)
 	{
-	case Main:	this->NetOperation(in);	break;
+	case Main:	this->NetOperation(in);		break;
+	case Player: _p->NetOperation(in);		break;
+	case Map:	g_map->NetOperation(in);	break;
 	default:
 		Log::Error("Unknown NetOp{}", Format(op));
 		break;
@@ -163,10 +168,21 @@ void App::OnPacket([[maybe_unused]] ENetEvent& ev)
 
 void App::NetOp_Login()
 {
-	
+	auto result = GetPacket()->ReadAs<bool>();
+
+	Log::Debug("Login result: {}", result);
+
+	if(!result)
+		return;
+
+	string name;
+	GetPacket()->Read(name);
+
+	g_scene->Set(SceneID::Game);	
+
+	Player::LoginName = name;
 }
 
 void App::NetOp_CreateAccount()
 {
-	
 }

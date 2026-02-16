@@ -2,6 +2,8 @@
 #include "App.h"
 #include "Player.h"
 #include "PlayerMgr.h"
+#include "GameMgr.h"
+#include "Game.h"
 
 App::App()
 	: Broadcaster<Op>(NetOp::Main)
@@ -29,7 +31,6 @@ void App::NetOperationProcess()
 	switch(GetOperation())
 	{
 		OP(Login);
-		OP(CreateAccount);
 
 	default:
 		Log::Error("Unknown MainOp{}", Format(GetOperation()));
@@ -55,7 +56,7 @@ void App::OnConnect([[maybe_unused]] ENetEvent& ev)
 
 void App::OnPacket(ENetEvent& ev)
 {
-	auto* p = OnAuth(ev);
+	auto* p = g_player_mgr->OnAuth(ev.peer);
 	if (!p)
 	{
 		Log::Error("App::OnPacket::!p");
@@ -64,13 +65,13 @@ void App::OnPacket(ENetEvent& ev)
 	
 	using enum NetOp;
 	InPkt in(ev.packet);
+	const auto op = in.ReadAs<NetOp>();
+
 	const InOperation opt(in, p, ev.peer);
 
-	switch (const auto op = in.ReadAs<NetOp>();
-		op)
+	switch (op)
 	{
 	case Main:	this->NetOperation(opt);	break;
-
 	default: // #todo
 		Log::Error("Unknown NetOp{}", Format(op));
 		break;
@@ -83,98 +84,27 @@ void App::OnDisconnect([[maybe_unused]] ENetEvent& ev)
 	//g_player_mgr->_array[*player_idx].get();
 }
 
-Player* App::OnAuth(const ENetEvent& ev) const
-{
-	Player* player = nullptr;
-
-	if (auto& player_idx = reinterpret_cast<PlayerIdx*&>(ev.peer->data); 
-		!player_idx)
-	{
-		for (PlayerIdx i = 1; i < player::kMax; i++)
-		{
-			auto& p = g_player_mgr->_array[i];
-			if (!p)
-			{
-				p = make_unique<Player>(i, ev.peer);
-				player_idx = new PlayerIdx(i);
-				player = p.get();
-				g_player_mgr->_list.push_back(p.get());
-				Print("OnAuth: PlayerIdx {}", i);
-				break;
-			}
-		}
-	}
-	else
-	{
-		player = g_player_mgr->_array[*player_idx].get();
-	}
-
-	return player;
-}
-
 void App::NetOp_Login()
 {
-	const Auth auth(GetPacket());
-	if (!auth.IsValid())
-	{
-		Log::Error("NetOp_Login: Invalid Auth{}", Format(auth));
-		return;
-	}
-	
-	Print("NetOp_Login: Incoming Auth{}", Format(auth));
+	auto name = GetPacket()->ReadFixed(player::kNameSize + 1);
 
-	const auto sql = Sql::Create();
-	if (!sql)
-		return;
-
-	if (const auto res = sql->Select("players",
-		{ "username", "password" }, 
-		format(" WHERE `username` = '{}' LIMIT 1", auth._user)))
+	for(auto & player : g_player_mgr->_list)
 	{
-		if (const auto it = res->Pop())
+		if(player->_name == name)
 		{
-			if (auth._pass == it->Get<string>("password"))
-			{
-				Print("Login success for Auth{}", Format(auth));
-				Send(GetPlayer(), MainOp::Login, true);
-				return;
-			}
+			Send(GetPlayer(), MainOp::Login, false);
+			return;
 		}
 	}
+
+	GetPlayer()->_name = name;
+	Send(GetPlayer(), MainOp::Login, true, GetPlayer()->_name);
 	
-	Send(GetPlayer(), MainOp::Login, false);
-	Print("Login failure for Auth{}", Format(auth));
-}
-
-void App::NetOp_CreateAccount()
-{
-	const auto sql = Sql::Create();
-	if (!sql)
-		return;
-
-	const Auth auth(GetPacket());
-	if (!auth.IsValid())
 	{
-		Log::Error("NetOp_CreateAccount: Invalid Auth{}", Format(auth));
-		return;
+		const game::ID id = 1;
+		auto game = g_games->GetOrCreate(id);
+		game->EnterGame(GetPlayer());
 	}
 
-	const auto res = sql->Select("players",
-		{ "uid" }, format(" WHERE username = '{}' LIMIT 1", auth._user));
-	
-	Send(GetPlayer(), MainOp::CreateAccount, res->IsEmpty());
-
-	if (res->IsEmpty())
-	{
-		sql->Insert("players",
-			vector<string>{"username", "password" },
-			vector<vector<string>>{ { { auth._user }, { auth._pass } }}
-		);
-
-		Print("Create account success: username({})", auth._user);
-	}
-	else
-	{	
-		Print("Create account failure: username({}) already in use", auth._user);
-	}
+	Log::Debug("Player logged in as {}", name);
 }
