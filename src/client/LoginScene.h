@@ -1,21 +1,24 @@
 #pragma once
 #include "Scene.h"
 
-class LoginScene : public Scene
+struct LoginScene : Scene
 {
-public:
 	LoginScene();
-	~LoginScene();
-	
+	~LoginScene() override;
+
 	static constexpr auto kID = SceneID::Login;
 
 	void Tick() override;
-	
-	void Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const override;
-	void HandleEvents(const sf::Event& ev) override;
-	void ProcessUI() const override;
+	void Render() override;
+	void ProcessUI() override;
 
 	sf::CircleShape _circle;
 
-	Auth _auth;
+	// The ImGui fields (a name / password and its zero)
+	char _user[player::kNameSize + 1]{};
+	char _pass[player::kPasswordSize + 1]{};
+	// The name of the last login sent (the account once the server accepts it)
+	string _sent_user;
+	// What the server last said (connection, login, new account)
+	string _status = "Connecting...";
 };

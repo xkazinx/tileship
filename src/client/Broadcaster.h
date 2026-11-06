@@ -1,31 +1,30 @@
 #pragma once
 
-template<class Op = broadcaster::DummyOp>
-class Broadcaster : public broadcaster::Base<Op>
+// The client's broadcasters: a packet family's operations sent to the server and
+// read from it (common/broadcaster.h)
+template <class Op>
+struct Broadcaster : broadcaster::Base<Op>
 {
-	broadcaster::InOperationBase _opt;
+	explicit Broadcaster(const NetOp net_op) : broadcaster::Base<Op>(net_op) {}
+	~Broadcaster() override = default;
 
-public:
-	using Peer = ENetPeer;
-
-	explicit Broadcaster(const NetOp net_op) : broadcaster::Base<Op>(net_op){}
-	~Broadcaster() override {}
-
-	template <typename ... Args>
-	void Send(Op op, const Args&...args) const
+	// <NetOp><op><args...> to the server
+	template <typename... Args>
+	void Send(const Op op, const Args &... args) const
 	{
-		auto out = packet::Out::CreateStatic(this->_net_op, op, std::forward<const Args>(args)...);
-		Global::Send(out);
+		Global::Send(this->Pkt(op, args...));
 	}
 
-	void NetOperation(packet::In & pkt)
+	// The packet's operation, then its handler (NetOperationProcess)
+	void NetOperation(IPkt * const in)
 	{
-		pkt.Read(this->_op);
-		_opt = broadcaster::InOperationBase(pkt);
-		NetOperationProcess();
+		_in = in;
+		if (this->FetchOperation(in))
+			NetOperationProcess();
 	}
 
 	virtual void NetOperationProcess() = 0;
 
-	auto GetPacket() const { return _opt.GetPacket(); }
+	// The packet being handled, after its operation
+	IPkt * _in = nullptr;
 };

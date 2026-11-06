@@ -1,46 +1,14 @@
 #pragma once
+// The game's broadcasters, on kazilib's (net/broadcaster.h): a family of packets
+// under one NetOp, each told apart by its own operation, <NetOp><Op><fields...>,
+// every packet of a static tier summed from its fields' types (OPkt::Create).
+// The client's and the server's own Broadcaster (src/client, src/server) add
+// how a packet is sent and who it came from.
 
 namespace common::broadcaster
 {
-	class InOperationBase
-	{
-		InPkt * _pkt = nullptr;
-
-	public:
-		InOperationBase() = default;
-		explicit InOperationBase(InPkt & pkt) : _pkt(&pkt) {}
-		auto GetPacket() const { return _pkt; }
-	};
-
-	enum class DummyOp { };
-
-	template<class Op>
-	class Base
-	{
-	public:
-		using Peer = ENetPeer;
-
-		explicit Base(const NetOp net_op) : _net_op(net_op) {}
-		virtual ~Base() = default;
-
-		auto GetOperation() const { return _op; }
-
-		template<typename ... Args>
-		packet::OutPacketPtr StaticPacket(Op op, Args && ... args) const
-		{
-			return OutPkt::CreateStatic(_net_op, op, args...); // #why not forward here?
-		}
-
-		template<typename ... Args>
-		packet::OutPacketPtr DynamicPacket(Op op, Args && ... args) const
-		{
-			return OutPkt::CreateDynamic(_net_op, op, std::forward<Args>(args)...);
-		}
-
-	protected:
-		Op _op;
-		NetOp _net_op;
-	};
+	template <class Op>
+	using Base = lib::BroadcasterBase<NetOp, Op, lib::PktSizing::Static>;
 }
 
 #define OP(op) case Op::op: NetOp_##op(); break;

@@ -1,24 +1,22 @@
 #pragma once
 
-class Sql;
+struct Sql;
 using SelectValue = szt;
 
-class SelectItem
+struct SelectItem
 {
-public:
-	SelectItem(const MYSQL_ROW & row, const vector<unsigned long> & length, const map<string, SelectValue>& fields)
+	SelectItem(const MYSQL_ROW & row, const vector<unsigned long> & length, const unordered_map<string, SelectValue> & fields)
 		: _row(row), _length(length), _fields(fields)
 	{
-		
 	}
 
-	template<typename T>
-	T Get(string field)
+	template <typename T>
+	T Get(const string & field)
 	{
-		if (_fields.contains(field))
+		if (const auto it = _fields.find(field); it != _fields.end())
 		{
-			const auto idx = _fields.at(field);
-			string data(_row[idx], _length[idx]);
+			const auto idx = it->second;
+			const string data = _row[idx] ? string(_row[idx], _length[idx]) : string();
 
 			if constexpr (is_same_v<bool, T>)
 			{
@@ -27,45 +25,35 @@ public:
 			else if constexpr (std::is_arithmetic_v<T>)
 			{
 				if constexpr (std::is_floating_point_v<T>)
-				{
-					return (T)std::strtof(data);
-				}
+					return (T)std::stod(data);
+				else if constexpr (std::is_signed_v<T>)
+					return (T)std::stoll(data);
 				else
-				{
-					if constexpr (std::is_signed_v<T>)
-					{
-						return (T)std::stoll(data);
-					}
-					else if constexpr (std::is_unsigned_v<T>)
-					{
-						return (T)std::stoull(data);
-					}
-				}
+					return (T)std::stoull(data);
 			}
-			else return data;
+			else
+				return data;
 		}
 
-		Log::Error("Field not found for SelectItem::Pop: {}", field);
-		return string("");
+		Err("Field not found for SelectItem::Get: {}", field);
+		return T{};
 	}
 
 	const MYSQL_ROW & _row;
-	const vector<unsigned long>& _length;
-	const map<string, SelectValue> & _fields;
+	const vector<unsigned long> & _length;
+	const unordered_map<string, SelectValue> & _fields;
 };
 
-class SelectResult final
+struct SelectResult final
 {
-public:
-	SelectResult(Sql* sql);
-
+	explicit SelectResult(Sql * sql);
 	~SelectResult();
 
-	MYSQL_RES* _ptr;
+	MYSQL_RES * _ptr;
 	vector<MYSQL_ROW> _rows;
-	vector<MYSQL_FIELD*> _fields;
+	vector<MYSQL_FIELD *> _fields;
 	vector<vector<unsigned long>> _lengths;
-	map<string, SelectValue> _fields_indexes;
+	unordered_map<string, SelectValue> _fields_indexes;
 	SelectValue _current_row_idx = 0;
 
 	unique_ptr<SelectItem> Pop()
@@ -74,32 +62,44 @@ public:
 		if (idx >= _rows.size())
 			return nullptr;
 
-		return make_unique<SelectItem>(_rows[(szt)idx], _lengths[(szt)idx],_fields_indexes);
+		return make_unique<SelectItem>(_rows[(szt)idx], _lengths[(szt)idx], _fields_indexes);
 	}
 
 	auto GetCount() const { return _rows.size(); }
 	auto IsEmpty() const { return _rows.empty(); }
 };
 
-class Sql final
+// One connection to the game's database. Where it is: the startup flags (init.json
+// beside the exe, kept out of git: src/server/init.json.example) db_host
+// ("localhost": the local socket on Linux), db_port (3306), db_user, db_pass,
+// db_name ("tileship"), db_socket (a socket path; "" = the client library's own)
+struct Sql final
 {
-public:
 	Sql();
 	~Sql();
+	Sql(const Sql &) = delete;
+	Sql & operator=(const Sql &) = delete;
 
+	// A connection, or nullptr (an Err line says why)
 	static unique_ptr<Sql> Create();
+	// The tables, made when missing (at the server's start)
+	static bool EnsureSchema();
+
 	MYSQL _ptr;
 
 	auto Get() { return &_ptr; }
 
 	unsigned FetchError();
 
-	// #todo make class query
-	void Query(const string & query);
-	void Insert(const string & table, const vector<string> & columns, const vector<vector<string>> & rows);
-	unique_ptr<SelectResult> Select(const string& table, const vector<string>& columns, const string& extra = "");
+	// false (and an Err line) when the server refused it
+	bool Query(const string & query);
+	bool Insert(const string & table, const vector<string> & columns, const vector<vector<string>> & rows);
+	unique_ptr<SelectResult> Select(const string & table, const vector<string> & columns, const string & extra = "");
 
-	static string Scape(const string& str, const string& scape, const string& add = "")
+	// A value as an SQL string literal: escaped for this connection, in quotes
+	string Quote(const string & value);
+
+	static string Scape(const string & str, const string & scape, const string & add = "")
 	{
 		return scape + str + scape + add;
 	}

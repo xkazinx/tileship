@@ -4,42 +4,40 @@
 #include "GameScene.h"
 
 SceneMgr::SceneMgr()
+	: _login(make_unique<LoginScene>()), _game(make_unique<GameScene>())
 {
-	Set(ID::Game);
 }
 
-SceneMgr::~SceneMgr()
-{
-	
-}
+SceneMgr::~SceneMgr() = default;
 
-void SceneMgr::Set(ID id)
+void SceneMgr::Set(const ID id)
 {
 	using enum ID;
-	switch(id)
+	switch (id)
 	{
-	case Login:	_ptr = make_unique<LoginScene>();	break;
-	case Main:										break;
-	case Lobby:										break;
-	case Game:	_ptr = make_unique<GameScene>();	break;
-	case Result:									break;
-	default: 
-		break;
+	case Login:	_mgr.Set(*_login);	break;
+	case Main:						return;
+	case Lobby:						return;
+	case Game:	_mgr.Set(*_game);	break;
+	case Result:					return;
+	default:						return;
 	}
+	_id = id;
 }
 
-void SceneMgr::Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const
+void SceneMgr::Render()
 {
-	_ptr->Render(tgt, states);
-	_ptr->ProcessUI();
+	_mgr.Render();
+	if (auto * const s = static_cast<Scene *>(_mgr._current))
+		s->ProcessUI();
 }
 
 void SceneMgr::Tick()
 {
-	
+	_mgr.Tick();
 }
 
-bool SceneMgr::HandleEvent([[maybe_unused]] const sf::Event& ev)
+void SceneMgr::HandleEvent(const sf::Event & ev)
 {
-	return false;
+	_mgr.HandleEvent(&ev);
 }

@@ -1,13 +1,18 @@
 #pragma once
+#include <scene/manager.h>
 
-class Scene
+// A client scene (kazilib scene/manager.h): Initialize when entered, Render each
+// frame on the window, HandleEvent with an sf::Event, and its ImGui windows
+struct Scene : lib::scene::Base
 {
-public:
-	Scene() {}
-	virtual ~Scene() {}
+	// Its ImGui windows, each frame after Render
+	virtual void ProcessUI() {}
+	// One window event
+	virtual void HandleEvents([[maybe_unused]] const sf::Event & ev) {}
 
-	virtual void Tick() = 0;
-	virtual void Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const = 0;
-	virtual void HandleEvents(const sf::Event& ev) = 0;
-	virtual void ProcessUI() const {}
+	void HandleEvent(const void * const event) override
+	{
+		if (event)
+			HandleEvents(*static_cast<const sf::Event *>(event));
+	}
 };

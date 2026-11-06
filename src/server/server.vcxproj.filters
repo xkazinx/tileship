@@ -2,92 +2,42 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="app">
-      <UniqueIdentifier>{a2ae25f5-a17b-415a-881e-c427a1c9a0fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="app\ph">
-      <UniqueIdentifier>{23f1edb3-f2e9-461b-b454-d9b1a3ccf4e6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="common">
-      <UniqueIdentifier>{3d119c3c-4581-4ae9-bc3c-c69223a4ab0d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="room">
-      <UniqueIdentifier>{20134c70-a68f-4101-a50c-44113a394877}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="lobby">
-      <UniqueIdentifier>{1d324a9e-d4e3-45c3-a098-ec7f08af7918}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="game">
-      <UniqueIdentifier>{90ae97f0-4bbf-4267-8a8f-d75d7a8e838d}</UniqueIdentifier>
+      <UniqueIdentifier>{6a2d3b4f-8e2c-4c9f-8b62-1d2f3e4a5b01}</UniqueIdentifier>
     </Filter>
     <Filter Include="player">
-      <UniqueIdentifier>{bf6c2dff-36a9-4ff9-81fb-6da576dc39e5}</UniqueIdentifier>
+      <UniqueIdentifier>{6a2d3b4f-8e2c-4c9f-8b62-1d2f3e4a5b02}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="database">
+      <UniqueIdentifier>{6a2d3b4f-8e2c-4c9f-8b62-1d2f3e4a5b03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{6a2d3b4f-8e2c-4c9f-8b62-1d2f3e4a5b04}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="App.h">
-      <Filter>app</Filter>
-    </ClInclude>
-    <ClInclude Include="stdafx.h">
-      <Filter>app\ph</Filter>
-    </ClInclude>
-    <ClInclude Include="targetver.h">
-      <Filter>app\ph</Filter>
-    </ClInclude>
-    <ClInclude Include="Global.h">
-      <Filter>app</Filter>
-    </ClInclude>
-    <ClInclude Include="Broadcaster.h">
-      <Filter>app</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.h">
-      <Filter>player</Filter>
-    </ClInclude>
-    <ClInclude Include="PlayerMgr.h">
-      <Filter>player</Filter>
-    </ClInclude>
-    <ClInclude Include="Sql.h">
-      <Filter>app</Filter>
-    </ClInclude>
+    <ClInclude Include="App.h"><Filter>app</Filter></ClInclude>
+    <ClInclude Include="Broadcaster.h"><Filter>app</Filter></ClInclude>
+    <ClInclude Include="Global.h"><Filter>app</Filter></ClInclude>
+    <ClInclude Include="stdafx.h"><Filter>app</Filter></ClInclude>
+    <ClInclude Include="targetver.h"><Filter>app</Filter></ClInclude>
+    <ClInclude Include="Player.h"><Filter>player</Filter></ClInclude>
+    <ClInclude Include="PlayerMgr.h"><Filter>player</Filter></ClInclude>
+    <ClInclude Include="Sql.h"><Filter>database</Filter></ClInclude>
+    <ClInclude Include="..\common\auth.h"><Filter>common</Filter></ClInclude>
+    <ClInclude Include="..\common\broadcaster.h"><Filter>common</Filter></ClInclude>
+    <ClInclude Include="..\common\common.h"><Filter>common</Filter></ClInclude>
+    <ClInclude Include="..\common\netops.h"><Filter>common</Filter></ClInclude>
+    <ClInclude Include="..\common\random.h"><Filter>common</Filter></ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="App.cpp">
-      <Filter>app</Filter>
-    </ClCompile>
-    <ClCompile Include="stdafx.cpp">
-      <Filter>app\ph</Filter>
-    </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>app</Filter>
-    </ClCompile>
-    <ClCompile Include="Global.cpp">
-      <Filter>app</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\socket.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\common.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="Player.cpp">
-      <Filter>player</Filter>
-    </ClCompile>
-    <ClCompile Include="PlayerMgr.cpp">
-      <Filter>player</Filter>
-    </ClCompile>
-    <ClCompile Include="Sql.cpp">
-      <Filter>app</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\random.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\packet.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\console\log.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\common\auth.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
+    <ClCompile Include="App.cpp"><Filter>app</Filter></ClCompile>
+    <ClCompile Include="Global.cpp"><Filter>app</Filter></ClCompile>
+    <ClCompile Include="main.cpp"><Filter>app</Filter></ClCompile>
+    <ClCompile Include="stdafx.cpp"><Filter>app</Filter></ClCompile>
+    <ClCompile Include="Player.cpp"><Filter>player</Filter></ClCompile>
+    <ClCompile Include="PlayerMgr.cpp"><Filter>player</Filter></ClCompile>
+    <ClCompile Include="Sql.cpp"><Filter>database</Filter></ClCompile>
+    <ClCompile Include="..\common\common.cpp"><Filter>common</Filter></ClCompile>
+    <ClCompile Include="..\common\random.cpp"><Filter>common</Filter></ClCompile>
   </ItemGroup>
 </Project>

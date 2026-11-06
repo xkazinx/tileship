@@ -2,56 +2,50 @@
 #include "LoginScene.h"
 #include "App.h"
 
-LoginScene::LoginScene() : 
+LoginScene::LoginScene() :
 	_circle(50.f, 50)
 {
 	_circle.setFillColor(sf::Color::Red);
-
-	_auth._user.resize(player::kNameSize);
-	_auth._pass.resize(player::kPasswordSize);
 }
 
-
-LoginScene::~LoginScene()
-{
-
-}
+LoginScene::~LoginScene() = default;
 
 void LoginScene::Tick()
 {
 }
 
-void LoginScene::ProcessUI() const
+void LoginScene::ProcessUI()
 {
-	ImGui::Begin("Hello, world!");
-	ImGui::InputText("Username", (char*)_auth._user.data(), player::kNameSize + 1);
-	ImGui::InputText("Password", (char*)_auth._pass.data(), player::kPasswordSize + 1, ImGuiInputTextFlags_Password);
+	ImGui::SetNextWindowPos(ImVec2(g_res_x / 2.f - 150.f, g_res_y / 2.f - 80.f), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize(ImVec2(300.f, 0.f), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Tileship");
+	ImGui::InputText("Username", _user, sizeof(_user));
+	ImGui::InputText("Password", _pass, sizeof(_pass), ImGuiInputTextFlags_Password);
 
+	const Auth auth(_user, _pass);
 	if (ImGui::Button("Login"))
 	{
-		Log::Debug("Sent Login Auth{}", Format(_auth));
-		g_app->Send(MainOp::Login, _auth);
-
-		// #test sending and reading with size 32 but written < 32 with char and string
-		// #test sending and reading with size 32 and written 32 with char and string
+		Out("Sent Login Auth{}", Format(auth));
+		_sent_user = auth._user;
+		_status = "Logging in...";
+		g_app->Send(MainOp::Login, auth);
 	}
-	
+
+	ImGui::SameLine();
 	if (ImGui::Button("Create Account"))
 	{
-		Log::Debug("Sent Create Account Auth{}", Format(_auth));
-		g_app->Send(MainOp::CreateAccount, _auth);
+		Out("Sent Create Account Auth{}", Format(auth));
+		_status = "Creating the account...";
+		g_app->Send(MainOp::CreateAccount, auth);
 	}
+
+	if (!_status.empty())
+		ImGui::TextWrapped("%s", _status.c_str());
 
 	ImGui::End();
 }
 
-void LoginScene::Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const
+void LoginScene::Render()
 {
-	tgt.draw(_circle, states);
+	g_app->_window.draw(_circle);
 }
-
-void LoginScene::HandleEvents([[maybe_unused]] const sf::Event& ev)
-{
-
-}
-

@@ -1,0 +1,10 @@
+{
+  "port": 7021,
+  "ws": 7020,
+  "ws_bind": "127.0.0.1",
+  "db_host": "localhost",
+  "db_port": 3306,
+  "db_user": "tileship",
+  "db_pass": "<the tileship account's password>",
+  "db_name": "tileship"
+}

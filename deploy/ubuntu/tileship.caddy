@@ -1,0 +1,19 @@
+# tileship (github.com/xkazinx/tileship) at kazin.dev/projects/tileship: the web
+# build, and its WebSocket to the game server's gateway (tileship.service on
+# 127.0.0.1:7020). Written by deploy/ubuntu/install.sh. Imported inside the
+# kazin.dev site block (`import /etc/caddy/sites/kazin.dev.d/*.caddy`).
+redir /projects/tileship /projects/tileship/ permanent
+
+# The page's WebSocket (wss://kazin.dev/projects/tileship/ws): the gateway takes
+# the upgrade on any path
+handle /projects/tileship/ws {
+	reverse_proxy 127.0.0.1:7020
+}
+
+# The web build, with the prefix taken off; revalidated each visit (a new build
+# keeps its names)
+handle_path /projects/tileship/* {
+	root * /opt/tileship/web
+	header Cache-Control "no-cache"
+	file_server
+}

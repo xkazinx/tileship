@@ -1,0 +1,4 @@
+# The box's files keep LF in every checkout (bash, systemd, Caddy)
+*.sh text eol=lf
+*.service text eol=lf
+*.caddy text eol=lf

@@ -3,23 +3,23 @@
 
 namespace common
 {
-class Random
+struct Random
 {
-	std::mt19937 _engine;
+	// The device first: the engine is seeded from it (members are made in this order)
 	std::random_device _device;
+	std::mt19937 _engine;
 
-public:
 	Random();
 	~Random();
 
 	template<typename T>
 	T Generate(const T & from, const T & to)
 	{
-		if constexpr (std::is_floating_point_v<T>) 
+		if constexpr (std::is_floating_point_v<T>)
 		{
 			return std::uniform_real_distribution<T>(from, to)(_engine);
 		}
-		else 
+		else
 		{
 			return std::uniform_int_distribution<T>(from, to)(_engine);
 		}

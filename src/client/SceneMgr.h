@@ -1,19 +1,25 @@
 #pragma once
+#include <scene/manager.h>
 
-class Scene;
+struct Scene;
+struct LoginScene;
+struct GameScene;
 
-class SceneMgr
+// The client's scenes, each made once, on kazilib's scene manager (one current)
+struct SceneMgr
 {
-public:
 	using ID = SceneID;
 
 	SceneMgr();
 	~SceneMgr();
-	
-	unique_ptr<Scene> _ptr;
+
+	unique_ptr<LoginScene> _login;
+	unique_ptr<GameScene> _game;
+	lib::scene::Manager _mgr;
+	ID _id = ID::Login;
 
 	void Set(ID id);
-	void Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const;
+	void Render();
 	void Tick();
-	bool HandleEvent(const sf::Event& ev);
+	void HandleEvent(const sf::Event & ev);
 };

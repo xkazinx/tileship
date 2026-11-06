@@ -1,57 +1,36 @@
 #pragma once
 
-class Player;
+struct Player;
 
-class InOperation : public broadcaster::InOperationBase
+// The server's broadcasters: a packet family's operations read from a player and
+// sent to one (common/broadcaster.h)
+template <class Op>
+struct Broadcaster : broadcaster::Base<Op>
 {
-	Player* _player;
-	ENetPeer* _peer;
-
-public:
-	auto GetPlayer() const { return _player; }
-	auto GetPeer() const { return _peer; }
-
-	InOperation() : _player(nullptr), _peer(nullptr){}
-	InOperation(packet::In & pkt, Player * player, ENetPeer * peer)
-		: InOperationBase(pkt), _player(player), _peer(peer){}
-	InOperation(const InOperation& opt) : _player(opt.GetPlayer()), _peer(opt.GetPeer()){}
-};
-
-template<class Op>
-class Broadcaster : public broadcaster::Base<Op>
-{
-	InOperation _opt;
-
-public:
-	using Peer = ENetPeer;
-
-	explicit Broadcaster(const NetOp net_op) : broadcaster::Base<Op>(net_op){}
+	explicit Broadcaster(const NetOp net_op) : broadcaster::Base<Op>(net_op) {}
 	~Broadcaster() override = default;
 
-	template <typename ... Args>
-	void Send(const Player* player, Op op, Args && ... args)
+	// <NetOp><op><args...> to the player
+	template <typename... Args>
+	void Send(const Player * const player, const Op op, const Args &... args) const
 	{
-		// #todo #packet make it so you can send the argument directly
-		auto out = broadcaster::Base<Op>::StaticPacket(op, forward<Args>(args)...);
-		Global::Send(player, out);
+		Global::Send(player, this->Pkt(op, args...));
 	}
 
-	/*template <typename ... Args>
-	void Send(const class Room* room, Op op, Args&& ... args)
+	// The packet's operation, then its handler (NetOperationProcess), with who sent it
+	void NetOperation(IPkt * const in, Player * const player, ENetPeer * const peer)
 	{
-		Global::Send(room, StaticPacket(this->_net_op, op, std::forward<Args>(args)...));
-	}*/
-
-	void NetOperation(const InOperation& opt)
-	{
-		opt.GetPacket()->Read(this->_op);
-		_opt = opt;
-		NetOperationProcess();
+		_in = in;
+		_player = player;
+		_peer = peer;
+		if (this->FetchOperation(in))
+			NetOperationProcess();
 	}
 
 	virtual void NetOperationProcess() = 0;
 
-	auto GetPlayer() const { return _opt.GetPlayer();	}
-	auto GetPacket() const { return _opt.GetPacket();	}
-	auto GetPeer()	  const { return _opt.GetPeer();		}
+	// The packet being handled (after its operation), its player and peer
+	IPkt * _in = nullptr;
+	Player * _player = nullptr;
+	ENetPeer * _peer = nullptr;
 };

@@ -1,0 +1,25 @@
+# tileship's game server on the Ubuntu box (kazin.dev/projects/tileship): ENet on
+# UDP 7021 (native clients), browsers through its WebSocket gateway on
+# 127.0.0.1:7020 behind Caddy (tileship.caddy); its accounts in the local MySQL
+# (database tileship, the account in /opt/tileship/bin/init.json). Installed by
+# install.sh.
+[Unit]
+Description=tileship game server (kazin.dev/projects/tileship)
+After=network-online.target mysql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=tileship
+Group=tileship
+WorkingDirectory=/opt/tileship
+ExecStart=/opt/tileship/bin/tileship_server port=7021 ws=7020 ws_bind=127.0.0.1
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

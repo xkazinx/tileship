@@ -1,13 +1,13 @@
 #pragma once
 
-class Player
+struct Player
 {
-public:
-	Player(PlayerIdx idx, ENetPeer* peer);
+	Player(PlayerIdx idx, ENetPeer * peer);
 	~Player();
-	
-	PlayerIdx _idx;
-	ENetPeer* _peer;
-	string _ip;
-};
 
+	PlayerIdx _idx;
+	ENetPeer * _peer;
+	string _ip;
+	// The account logged in on this connection ("" before)
+	string _user;
+};

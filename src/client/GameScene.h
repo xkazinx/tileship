@@ -1,20 +1,22 @@
 #pragma once
 #include "Scene.h"
 
-class Map;
-class Tile;
+struct Map;
+struct Tile;
 
-class GameScene : public Scene
+struct GameScene : Scene
 {
-public:
 	GameScene();
-	~GameScene();
+	~GameScene() override;
 
 	static constexpr auto kID = SceneID::Game;
 
+	// The map, made the first time the scene is entered (its vertex buffers need
+	// the window's GL context)
+	void Initialize() override;
 	void Tick() override;
-	void Render(sf::RenderTarget& tgt, const sf::RenderStates& states) const override;
-	void HandleEvents(const sf::Event& ev) override;
-	
+	void Render() override;
+	void ProcessUI() override;
+
 	unique_ptr<Map> _map;
 };

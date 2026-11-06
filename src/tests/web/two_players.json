@@ -1,0 +1,32 @@
+[
+ {"page": 0, "wait": "Connected to the server", "timeout": 40},
+ {"page": 1, "wait": "Connected to the server", "timeout": 40},
+ {"sleep": 500},
+ {"page": 0, "shot": "web_login.png", "canvas": true},
+
+ {"page": 0, "click": [356, 256]},
+ {"page": 0, "type": "WebA{RUN}"},
+ {"page": 0, "click": [356, 279]},
+ {"page": 0, "type": "apple{RUN}"},
+ {"page": 0, "click": [362, 302]},
+ {"page": 0, "wait": "Account created", "timeout": 15},
+ {"page": 0, "shot": "web_created.png", "canvas": true},
+ {"page": 0, "click": [279, 302]},
+ {"page": 0, "wait": "Logged in as WebA{RUN}", "timeout": 15},
+
+ {"page": 1, "click": [356, 256]},
+ {"page": 1, "type": "WebB{RUN}"},
+ {"page": 1, "click": [356, 279]},
+ {"page": 1, "type": "wrong"},
+ {"page": 1, "click": [279, 302]},
+ {"page": 1, "wait": "Login refused for WebB{RUN}", "timeout": 15},
+ {"page": 1, "shot": "web_refused.png", "canvas": true},
+ {"page": 1, "click": [362, 302]},
+ {"page": 1, "wait": "Account created", "timeout": 15},
+ {"page": 1, "click": [279, 302]},
+ {"page": 1, "wait": "Logged in as WebB{RUN}", "timeout": 15},
+
+ {"sleep": 800},
+ {"page": 0, "shot": "web_game_a.png", "canvas": true},
+ {"page": 1, "shot": "web_game_b.png", "canvas": true}
+]

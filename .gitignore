@@ -1,13 +1,14 @@
-/src/client/Debug
-/src/client/Release
-
-/src/server/Debug
-/src/server/Release
-
+# Libraries fetched by setup.ps1
+/src/dep/SFML-3.1.0
+/src/dep/mysql-connector-c-6.1.11-win32
+# Intermediates
+/src/build/
+/src/.vs/
+/.vs
+*.vcxproj.user
+# Build output, local settings (the database account: init.json)
 /deploy/client
 /deploy/server
-
-/.vs
-src/.vs/
-
-*.vcxproj.user
+/deploy/exceptions/
+# Testerino endpoints, shots and reports
+/testerino/
