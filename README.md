@@ -3,6 +3,8 @@ A turn-based strategy game on an isometric tile engine (early stage): accounts a
 log in through the server, then the first map. SFML 3.1, ImGui, kazilib (enet and its
 packet layer), MySQL.
 
+**Made without AI** until the first Claude commit (bdc9efc, 2026-11-06); AI was used after that for the updated deployment and this README.
+
 **Play it in your browser: https://kazin.dev/projects/tileship/**
 
 ![Logged in: the first isometric tiles (grass, water, rock) and the player's name](docs/screenshot.png)
